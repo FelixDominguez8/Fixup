@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: '#191F24',
     padding: 20,
   },
   saludo: {
@@ -22,7 +22,7 @@ export const styles = StyleSheet.create({
   barraBusqueda: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#121518',
     borderRadius: 10,
     paddingHorizontal: 10,
     marginBottom: 20,
@@ -49,7 +49,7 @@ export const styles = StyleSheet.create({
     marginBottom: 20,
   },
   servicioBtn: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#121518',
     padding: 12,
     borderRadius: 12,
     width: '48%',
@@ -64,48 +64,98 @@ export const styles = StyleSheet.create({
     fontSize: 13,
   },
   tecnicoCard: {
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#121518',
     borderRadius: 10,
     padding: 12,
     marginBottom: 12,
   },
-  tecnicoImagen: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginBottom: 8,
-  },
   tecnicoInfo: {
     marginLeft: 8,
-  },
-  tecnicoNombre: {
-    color: 'white',
-    fontSize: 16,
-    fontFamily: 'Montserrat',
   },
   tecnicoDetalles: {
     color: '#ccc',
     fontSize: 13,
     fontFamily: 'Montserrat',
   },
+  tecnicoInfoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  tecnicoTextoContainer: {
+    flex: 1,
+    marginRight: 10,
+    marginLeft: 10,
+  },
+  tecnicoNombre: {
+    color: 'white',
+    fontSize: 18,
+    fontFamily: 'Montserrat',
+    marginBottom: 4,
+  },
+  estrellasContainer: {
+    flexDirection: 'row',
+    marginBottom: 4,
+  },
+  ubicacionCalificacion: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   tecnicoPuntaje: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    color: '#3B99A3',
+    color: '#FFFFFF',
     fontWeight: 'bold',
+    fontSize: 24,
+    marginLeft: 8,
+    paddingRight: 18,
   },
   botonesContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: 10,
+    marginTop: 8,
+    marginBottom: 8,
   },
   botonAccion: {
-    backgroundColor: '#3B99A3',
-    padding: 10,
+    backgroundColor: '#191F24',
+    paddingVertical: 10,
     borderRadius: 10,
     alignItems: 'center',
-    marginHorizontal: 5,
     flex: 1,
+    marginHorizontal: 5,
+  },
+  botonTexto: {
+    color: 'white',
+    fontSize: 12,
+    fontFamily: 'Montserrat',
+    marginTop: 4,
+  },
+  tecnicoImagen: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    paddingRight: 20,
+  },
+  botonesFilaContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between', 
+    marginTop: 12,
+  },
+  tecnicoBotones: {
+    backgroundColor: '#191F24',
+    borderRadius: 10,
+    paddingHorizontal: 30,
+    paddingVertical: 2,
+  },
+  flechaVolver: {
+    marginBottom: 10,
+  },
+  botonAccion2: {
+    backgroundColor: '#3B99A3',
+    paddingVertical: 10,
+    borderRadius: 10,
+    alignItems: 'center',
+    width: '100%',
+    flex: 1,
+    marginHorizontal: 5,
   },
 });

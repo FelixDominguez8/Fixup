@@ -1,30 +1,131 @@
-
-// login.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
   TextInput,
   TouchableOpacity,
   Image,
-  Platform,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import { styles } from './style/styleinicio';
-import { Feather } from '@expo/vector-icons'; // Íconos
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Feather } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+
+let emailTimeout: NodeJS.Timeout;
+let passwordTimeout: NodeJS.Timeout;
 
 export default function LoginScreen() {
+  const router = useRouter();
   const navigation = useNavigation<any>();
   const [mode, setMode] = useState<'login' | 'signup'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [userType, setUserType] = useState<'cliente' | 'tecnico'>('cliente');
+  const [loading, setLoading] = useState(false);
+
+  const [emailError, setEmailError] = useState(false);
+  const [passwordError, setPasswordError] = useState(false);
 
   React.useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
   }, [navigation]);
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  useEffect(() => {
+    if (emailTimeout) clearTimeout(emailTimeout);
+    emailTimeout = setTimeout(() => {
+      setEmailError(email.length > 0 && !emailRegex.test(email));
+    }, 1000);
+    return () => clearTimeout(emailTimeout);
+  }, [email]);
+
+  useEffect(() => {
+    if (passwordTimeout) clearTimeout(passwordTimeout);
+    passwordTimeout = setTimeout(() => {
+      setPasswordError(password.length > 0 && password.length < 6);
+    }, 1000);
+    return () => clearTimeout(passwordTimeout);
+  }, [password]);
+
+  const validateInputs = (): boolean => {
+    const isEmailValid = email.trim() !== '' && emailRegex.test(email);
+    const isPasswordValid = password.trim() !== '' && password.length >= 6;
+
+    setEmailError(!isEmailValid);
+    setPasswordError(!isPasswordValid);
+
+    if (!isEmailValid || !isPasswordValid) {
+      Alert.alert('Datos inválidos', 'Revisa los campos marcados en rojo.');
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleLogin = async () => {
+    if (!validateInputs()) return;
+    setLoading(true);
+    try {
+      const response = await fetch('https://fixup-backend.onrender.com/logIn', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correo: email, password }),
+      });
+  
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.msg || 'Error en el login');
+  
+      await AsyncStorage.setItem('userData', JSON.stringify({
+        uid: data.uid,
+        email: data.email,
+        userType: data.tipo, 
+      }));
+  
+      if (data.tipo === 'cliente') {
+        router.push('/(tabs)/inicio');
+      } else {
+        router.push('/(tabs)/inicioTecnico');
+      }
+    } catch (error: any) {
+      Alert.alert('Error de inicio de sesión', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSignUp = async () => {
+    if (!validateInputs()) return;
+    setLoading(true);
+    try {
+      const response = await fetch('https://fixup-backend.onrender.com/signUp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ correo: email, password, tipo: userType }), 
+      });
+
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.msg || 'Error al registrarse');
+
+      await AsyncStorage.setItem('userData', JSON.stringify({
+        uid: data.uid,
+        email: data.email,
+        userType, 
+      }));
+
+      Alert.alert('¡Registro exitoso!', 'Ya puedes iniciar sesión.');
+      setMode('login');
+    } catch (error: any) {
+      Alert.alert('Error de registro', error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -48,18 +149,20 @@ export default function LoginScreen() {
       </View>
 
       <TextInput
-        style={styles.input}
-        placeholder="Correo"
-        placeholderTextColor="#999"
+        style={[styles.input, emailError && { borderColor: 'red', borderWidth: 1 }]}
+        placeholder={emailError ? 'Correo inválido' : 'Correo'}
+        placeholderTextColor={emailError ? 'red' : '#999'}
         value={email}
         onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
       />
 
-      <View style={styles.passwordContainer}>
+      <View style={[styles.passwordContainer, passwordError && { borderColor: 'red', borderWidth: 1 }]}>
         <TextInput
           style={styles.passwordInput}
-          placeholder="Contraseña"
-          placeholderTextColor="#999"
+          placeholder={passwordError ? 'Mínimo 6 caracteres' : 'Contraseña'}
+          placeholderTextColor={passwordError ? 'red' : '#999'}
           secureTextEntry={!showPassword}
           value={password}
           onChangeText={setPassword}
@@ -87,21 +190,17 @@ export default function LoginScreen() {
 
       <TouchableOpacity
         style={styles.mainButton}
-        onPress={() => {
-          if (mode === 'login') {
-            // Podés poner validación aquí si querés
-            navigation.navigate('Inicio');
-          } else {
-            // lógica de Sign Up si hace falta
-            console.log('Registrarse...');
-          }
-        }}
+        onPress={mode === 'login' ? handleLogin : handleSignUp}
+        disabled={loading}
       >
-        <Text style={styles.mainButtonText}>
-          {mode === 'login' ? 'Log In' : 'Sign Up'}
-        </Text>
+        {loading ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.mainButtonText}>
+            {mode === 'login' ? 'Log In' : 'Sign Up'}
+          </Text>
+        )}
       </TouchableOpacity>
-
 
       {mode === 'login' && (
         <TouchableOpacity>
