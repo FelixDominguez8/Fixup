@@ -120,6 +120,7 @@ export default function ChatDetalle() {
     const uid = parsedUser?.uid;
 
     const nuevo = {
+      id: Date.now().toString(),
       mensaje: nuevoMensaje,
       fecha: new Date().toISOString(),
       enviadopor: uid,
